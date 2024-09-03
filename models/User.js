@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   verificationToken: { type: String },
   verificationTokenExpires: { type: Date },
   profileDetails: {
-    type: mongoose.Schema.Types.Mixed, // Additional profile details for employer/employee
+    type: mongoose.Schema.Types.Mixed,
   },
   createdAt: { type: Date, default: Date.now },
 });

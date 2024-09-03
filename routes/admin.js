@@ -3,7 +3,6 @@ const router = express.Router();
 const adminController = require("../controllers/adminController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Admin routes to approve or reject employers
 router.put(
   "/approve-employer/:userId",
   authMiddleware(["Admin"]),

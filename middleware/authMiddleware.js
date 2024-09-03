@@ -1,4 +1,3 @@
-// Middleware to verify JWT and restrict access based on role
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = (requiredRoles) => {
@@ -11,8 +10,7 @@ const authMiddleware = (requiredRoles) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decoded);
-      // Check if the user's role matches one of the required roles
+
       if (!requiredRoles.includes(decoded.role)) {
         return res.status(403).send("Access Denied: Insufficient Permissions");
       }
