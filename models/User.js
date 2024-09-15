@@ -13,9 +13,22 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   verificationTokenExpires: { type: Date },
-  profileDetails: {
-    type: mongoose.Schema.Types.Mixed,
-  },
+
+  // Profile Details (now directly within userSchema)
+  address1: { type: String, default: "" },
+  address2: { type: String, default: "" },
+  brp: { type: String, default: "" },
+  companyName: { type: String, default: "" },
+  companyNumber: { type: String, default: "" },
+  country: { type: String, default: "" },
+  employeeId: { type: String, default: "" },
+  firstName: { type: String, default: "" },
+  lastName: { type: String, default: "" },
+  passport: { type: String, default: "" },
+  phone: { type: String, default: "" },
+  postcode: { type: String, default: "" },
+  town: { type: String, default: "" },
+
   createdAt: { type: Date, default: Date.now },
 });
 

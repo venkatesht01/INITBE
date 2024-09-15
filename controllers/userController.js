@@ -12,46 +12,113 @@ const transporter = require("./transporterContoller");
 
 exports.register = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const {
+      email,
+      password,
+      role,
+      address1,
+      address2,
+      brp,
+      companyName,
+      companyNumber,
+      country,
+      employeeId,
+      firstName,
+      lastName,
+      passport,
+      phone,
+      postcode,
+      town,
+    } = req.body;
+    const username = firstName;
 
+    console.log(
+      email,
+      password,
+      role,
+      address1,
+      address2,
+      brp,
+      companyName,
+      companyNumber,
+      country,
+      employeeId,
+      firstName,
+      lastName,
+      passport,
+      phone,
+      postcode,
+      town
+    );
+
+    // Check for required fields
     if (!username || !email || !password || !role) {
-      return res.status(400).send("All fields are required");
-    }
-
-    if (!["employee", "employer"].includes(role)) {
       return res
         .status(400)
-        .send("Invalid role. Only employee or employer allowed.");
+        .json({ error: "Username, email, password, and role are required." });
     }
+    console.log(1);
 
+    // Validate role
+    if (!["employee", "employer"].includes(role)) {
+      return res.status(400).json({
+        error: "Invalid role. Only 'employee' or 'employer' roles are allowed.",
+      });
+    }
+    console.log(2);
+
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
+    console.log(existingUser);
     if (existingUser) {
       if (!existingUser.isVerified) {
-        return res
-          .status(400)
-          .send("Please verify your email before registering again.");
+        return res.status(400).json({
+          error: "Please verify your email before registering again.",
+        });
       }
-      return res.status(400).send("User already exists");
+      return res.status(400).json({ error: "User already exists" });
     }
+    console.log(3);
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generate verification token
     const verificationToken = crypto.randomBytes(32).toString("hex");
-    const verificationTokenExpires = Date.now() + 60 * 60 * 1000;
+    const verificationTokenExpires = Date.now() + 60 * 60 * 1000; // Expires in 1 hour
 
+    // Create a new user
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
       role,
-      isActive: role === "employee",
+      isActive: role === "employee", // Automatically activate employees
       isVerified: false,
       verificationToken,
       verificationTokenExpires,
+      address1: address1 || "",
+      address2: address2 || "",
+      brp: brp || "",
+      companyName: companyName || "",
+      companyNumber: companyNumber || "",
+      country: country || "",
+      email: email || "",
+      employeeId: employeeId || "",
+      firstName: firstName || "",
+      lastName: lastName || "",
+      passport: passport || "",
+      phone: phone || "",
+      postcode: postcode || "",
+      role: role || "employee",
+      town: town || "",
     });
 
+    // Save the new user to the database
     await newUser.save();
+    console.log(4);
 
+    // Send verification email
     const verificationLink = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
     await transporter.sendMail({
       from: "initproject461@gmail.com",
@@ -60,14 +127,13 @@ exports.register = async (req, res) => {
       html: `<p>Please click the link below to verify your email:</p><a href="${verificationLink}">Verify Email</a>`,
     });
 
-    res
-      .status(201)
-      .send(
-        `User registered successfully. A verification email has been sent to ${email}.`
-      );
+    // Respond to client
+    res.status(200).json({
+      message: `User registered successfully. A verification email has been sent to ${email}.`,
+    });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    console.error("Error during registration:", err.message);
+    res.status(500).json({ error: "Server Error" });
   }
 };
 
